@@ -81,7 +81,7 @@ void PointerHeap::Insert(T data){
 
 		}
 
-		MinHeapPercolateUp();
+		MinHeapPercolateUp(end);
 	}
 	++heapSize;
 }
@@ -93,12 +93,13 @@ void PointerHeap::DeleteMin(){
 
 	if(end->parentNode->rightNode == end){
 		end->parentNode->rightNode = nullptr;
+		end = end->parentNode->leftNode;
 	}
 	else{
 		end->parentNode->leftNode = nullptr;
+		end = end->parentNode;
 	}
-
-	end = end->parentNode;
+	
 
 	temp2->parentNode = nullptr;
 	temp2->rightNode = root->rightNode;
@@ -107,14 +108,33 @@ void PointerHeap::DeleteMin(){
 	root = temp2;
 
 	delete temp1;
+	delete temp2;
 
-	MinHeapPercolateDown()
 	--heapSize;
-	//delete root
+
+	//preserve min heap properties
+	MinHeapPercolateDown(root)
+	
 }
 
 void PointerHeap::MinHeapPercolateDown(IntCell *node){
+	while (node != end) {
+		if (node->data >= node->leftNode->data) {
 
+			swap(node->data, node->leftNode->data);
+
+			node = node->leftNode;
+		} 
+		else if (node->data >= node->rightNode->data) {
+			
+			swap(node->data, node->rightNode->data);
+
+			node = node->rightNode;
+		} 
+		else {
+			break;
+		}
+	}
 
 }
 void PointerHeap::MinHeapPercolateUp(IntCell *node){
@@ -127,13 +147,19 @@ void PointerHeap::MinHeapPercolateUp(IntCell *node){
 		} 
 		else {
 			//swap
-			T temp = node->data;
-			node->data = node->parentNode->data;
-			node->parentNode->data = temp;
+			swap(node->data, node->parentNode->data);
 
 			node = node->parentNode;
 		}
 	}
+}
+
+void swap(IntCell *a, IntCell *b){
+	IntCell *temp = new IntCell(node->data);
+	a->data = b->leftNode->data;
+	a->leftNode->data = temp->data;
+
+	delete temp;
 }
 
 //print root->data
